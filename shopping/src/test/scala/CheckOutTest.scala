@@ -2,7 +2,7 @@ import org.scalatest.FlatSpec
 import org.scalatest.Matchers._
 import org.scalatest.BeforeAndAfter
 import Products._
-
+import Offers._
 
 /**
   * Created by Nenyi on 06/03/2017.
@@ -20,6 +20,13 @@ class CheckOutTest extends FlatSpec with BeforeAndAfter {
   it should "have Oranges" in {
     checkOut.products(Orange) shouldBe true
   }
+  it should "have Buy One Get One Free Offer" in {
+    checkOut.SpecialOffers(BuyOneGetOneFree) shouldBe true
+  }
+  it should "have Three For Two Special Offer" in {
+    checkOut.SpecialOffers(ThreeForTwo) shouldBe true
+  }
+
   "Apple" should "have the name Apple" in {
     Apple.name shouldBe "Apple"
   }
@@ -47,5 +54,31 @@ class CheckOutTest extends FlatSpec with BeforeAndAfter {
     basket = List[ProductItem](Apple, Apple, Orange, Apple)
     checkOut = new CheckOut(basket)
     checkOut.totalCostOfBasket shouldBe 2.05
+  }
+
+  "Special Offers" should "find which Special Offers apply to the basket" in {
+    basket = List[ProductItem](Apple, Apple, Orange, Apple)
+    checkOut = new CheckOut(basket)
+    checkOut.validSpecialOffers shouldBe List(BuyOneGetOneFree)
+  }
+  it should "be applied to the Total cost" in {
+    basket = List[ProductItem](Apple, Apple, Orange, Apple)
+    checkOut = new CheckOut(basket)
+    checkOut.totalCostOfBasketWithDiscount shouldBe 1.45
+  }
+  it should "find 2 BuyOneGetOneFree" in {
+    basket = List[ProductItem](Apple, Apple, Orange, Apple, Apple)
+    checkOut = new CheckOut(basket)
+    checkOut.validSpecialOffers shouldBe List(BuyOneGetOneFree, BuyOneGetOneFree)
+  }
+  it should "find 2 BuyOneGetOneFree and 1 ThreeForTwo" in {
+    basket = List[ProductItem](Apple, Apple, Orange, Apple, Apple, Orange, Orange)
+    checkOut = new CheckOut(basket)
+    checkOut.validSpecialOffers shouldBe List(BuyOneGetOneFree, BuyOneGetOneFree, ThreeForTwo)
+  }
+  it should "2 BuyOneGetOneFree and 1 ThreeForTwo be applied to the Total cost" in {
+    basket = List[ProductItem](Apple, Apple, Orange, Apple, Apple, Orange, Orange)
+    checkOut = new CheckOut(basket)
+    checkOut.totalCostOfBasketWithDiscount shouldBe 1.70
   }
 }
