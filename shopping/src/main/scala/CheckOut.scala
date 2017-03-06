@@ -20,9 +20,9 @@ class CheckOut(shoppingBasket: List[ProductItem]) extends Inventory with Special
   private def doesSpecialOfferApply(offer: OfferItem) = {
     val basketGroups = basket.groupBy(_.name).mapValues(_.size).toSeq
     val offerGroups = offer.products.groupBy(_.name).mapValues(_.size).toSeq
-    val isTrue = offerGroups.map(b => {
-      val head = basketGroups.filter(_._1 == b._1).headOption.getOrElse(null)
-      if (b._2 <= head._2) true else false
+    val isTrue = offerGroups.map(item => {
+      val basketProductGroup = basketGroups.filter(_._1 == item._1).head
+      if (item._2 <= basketProductGroup._2) true else false
     })
     !isTrue.contains(false)
   }
@@ -30,11 +30,11 @@ class CheckOut(shoppingBasket: List[ProductItem]) extends Inventory with Special
   private def applySpecialOfferApply(offer: OfferItem) = {
     val basketGroups = basket.groupBy(_.name).mapValues(_.size).toSeq
     val offerGroups = offer.products.groupBy(_.name).mapValues(_.size).toSeq
-    val noOfSameOffer = offerGroups.map(b => {
-      val head = basketGroups.filter(_._1 == b._1).head
-      head._2 / b._2
-    })
-    for (i <- 1 to noOfSameOffer.max) yield offer
+    val noOfSameOffer = offerGroups.map{case (item: String, numberOfItems: Int) => {
+      val head = basketGroups.filter(_._1 == item).head
+      head._2 / numberOfItems
+    }}
+    for (i <- 1 to noOfSameOffer.min) yield offer
   }
 
   def totalCostOfBasketWithDiscount = applySpecialOffersToBasket(validSpecialOffers)
