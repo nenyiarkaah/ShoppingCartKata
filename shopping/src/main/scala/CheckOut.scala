@@ -22,7 +22,11 @@ class CheckOut(shoppingBasket: List[ProductItem]) extends Inventory with Special
     val offerGroups = offer.products.groupBy(_.name).mapValues(_.size).toSeq
     val isTrue = offerGroups.map(item => {
       val basketProductGroup = basketGroups.filter(_._1 == item._1).head
-      if (item._2 <= basketProductGroup._2) true else false
+      val (product, productQuantity) = basketGroups.filter(_._1 == item._1).headOption match {
+        case None => (None, 0)
+        case Some(x) => (x, x._2)
+      }
+      if (item._2 <= productQuantity) true else false
     })
     !isTrue.contains(false)
   }
